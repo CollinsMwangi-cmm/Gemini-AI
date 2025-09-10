@@ -43,7 +43,7 @@ def search_for_artist(token, artist_name):
     if len(json_result) ==0:
         print("No artist with this name exists...")
         return None
-    return json_result[0]
+    return json_result[0]['uri']
 
 
 def get_songs_by_artist(token, artist_id):
@@ -54,10 +54,20 @@ def get_songs_by_artist(token, artist_id):
     return json_result
 
 
-token = get_token()
-result = search_for_artist (token, "toxic lyrikali")
-artist_id = result['id']
-songs = get_songs_by_artist(token, artist_id)
+def search_for_song(token, song_name):
+    url = 'https://api.spotify.com/v1/search'
+    headers = get_auth_header(token)
+    query = f"?q={song_name}&type=track&limit=1"
+    
+    query_url = url + query
+    result = get(query_url, headers=headers)
+    json_result = json.loads(result.content)["tracks"]["items"]
+    
+    if len(json_result) == 0:
+        print("No song with this name exists...")
+        return None
+    return json_result[0]["uri"]
 
-for i, song in enumerate(songs):
-    print(f"{i+1}. {song['name']}")
+
+
+token = get_token()

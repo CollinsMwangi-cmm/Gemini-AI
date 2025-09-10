@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 import subprocess
 from todoapp import add_task
+from spotify import *
 
 
 
@@ -72,7 +73,7 @@ chat = model.start_chat(history=[
 
 print("Chat with Gemini! Type 'exit' to quit")
 while True:
-    user_input = take_command()
+    user_input = input("you: ")
     if user_input.lower() == 'exit':
         break
     
@@ -91,6 +92,19 @@ while True:
     elif "open spotify" in user_input.lower():
         subprocess.Popen('spotify.exe')
         continue
+    
+    elif "play" in user_input.lower():
+        song_or_artist = user_input.replace("play", "").strip()
+        uri = search_for_song(token, song_or_artist)
+        if not uri:
+            uri = search_for_artist(token, song_or_artist)
+            
+        
+        if uri:
+            os.system(f'start {uri}')
+            speak(f"playing {song_or_artist} on Spotify")
+        else:
+            speak("Song not found")
     
     elif "add task" in user_input.lower():
         task = user_input.split("add task")[-1].strip()
