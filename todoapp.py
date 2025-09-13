@@ -39,11 +39,12 @@ def view_tasks():
 
 # delete task
 def delete_task(ref):
-    
+    load_task()
     # case1 , if task is referred by its number 
     if isinstance(ref, int):
         if 0 <= ref < len(tasks):
             removed_task = tasks.pop(ref)
+            save_task()
             return f"Task '{removed_task['Task']}' was removed"
         else:
             return f"Invalid task number: {ref}"
@@ -53,4 +54,27 @@ def delete_task(ref):
         for i, task in enumerate(tasks):
             if ref.lower() in task['Task'].lower():
                 removed_task = tasks.pop(i)
+                save_task()
                 return f"Task '{removed_task['Task']}' was removed"
+
+
+#mark task as completed
+def mark_task(ref):
+    load_task()
+    
+    #case1, is id task is referred by its number
+    if isinstance(ref, int):
+        if 0 <= ref < len(tasks):
+            tasks[ref]['Status'] = 'completed'
+            save_task()
+            return f"Task '{tasks[ref]['Task']}' is marked as completed"
+        else:
+            return f"Invalid task number: {ref}"
+        
+    #case2, if task is referred by its name
+    if isinstance (ref, str):
+        for i, task in enumerate(tasks):
+            if ref.lower() in task['Task'].lower():
+                tasks[i]['Status'] = 'completed'
+                save_task()
+                return f"Task '{tasks[i]['Task']}' is marked as completed"

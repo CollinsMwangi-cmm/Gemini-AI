@@ -1,6 +1,10 @@
 [
     {
         "Task": "go shopping",
-        "Status": "Pending"
+        "Status": "completed"
+    },
+    {
+        "Task": "so laundry",
+        "Status": "completed"
     }
 ]

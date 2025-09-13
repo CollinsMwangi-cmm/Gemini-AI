@@ -5,8 +5,10 @@ import requests
 import os
 from dotenv import load_dotenv
 import subprocess
-from todoapp import add_task
+from todoapp import add_task, delete_task, view_tasks, load_task, mark_task
 from spotify import *
+import time
+
 
 
 
@@ -72,45 +74,82 @@ chat = model.start_chat(history=[
 
 
 print("Chat with Gemini! Type 'exit' to quit")
-while True:
-    user_input = input("you: ")
-    if user_input.lower() == 'exit':
-        break
-    
-    
-    
-    elif "weather" in user_input.lower():
-        city = user_input.split("in")[-1].strip()
-        weather_info = weather(city)
-        speak(weather_info)
-        continue
-    
-    elif "open calculator" in user_input.lower():
-        subprocess.Popen('calc.exe')
-        continue
-    
-    elif "open spotify" in user_input.lower():
-        subprocess.Popen('spotify.exe')
-        continue
-    
-    elif "play" in user_input.lower():
-        song_or_artist = user_input.replace("play", "").strip()
-        uri = search_for_song(token, song_or_artist)
-        if not uri:
-            uri = search_for_artist(token, song_or_artist)
-            
+def convo_flow():
+    load_task()
+    while True:
+        user_input = input("you: ")
+        if user_input.lower() == 'exit':
+            break
         
-        if uri:
-            os.system(f'start {uri}')
-            speak(f"playing {song_or_artist} on Spotify")
-        else:
-            speak("Song not found")
+        
+        
+        elif "weather" in user_input.lower():
+            city = user_input.split("in")[-1].strip()
+            weather_info = weather(city)
+            speak(weather_info)
+            continue
+        
+        elif "open calculator" in user_input.lower():
+            subprocess.Popen('calc.exe')
+            continue
+        
+        elif "open spotify" in user_input.lower():
+            subprocess.Popen('spotify.exe')
+            continue
+        
+        elif "play" in user_input.lower():
+            song_or_artist = user_input.replace("play", "").strip()
+            uri = search_for_song(token, song_or_artist)
+            if not uri:
+                uri = search_for_artist(token, song_or_artist)
+                
+            
+            if uri:
+                os.system(f'start {uri}')
+                speak(f"playing {song_or_artist} on Spotify")
+            else:
+                speak("Song not found")
+        
+        elif "add task" in user_input.lower():
+            task = user_input.split("add task")[-1].strip()
+            result = add_task(task)
+            speak(result)
+            continue
+        
+        elif "remove task"  in user_input.lower():
+            ref = user_input.split("remove task")[-1].strip()
+            if ref.isdigit():
+                result = delete_task(int(ref)-1)
+            else:
+                result = delete_task(ref)
+            speak(result)
+            continue
+        
+        elif "show list" in user_input.lower():
+            result = view_tasks()
+            speak(result)
+            continue
+        
+        elif "complete task" in user_input.lower():
+            task_ref = user_input.split("complete task")[-1].strip()
+            if task_ref.isdigit():
+                result = mark_task(int(task_ref)-1)
+            else:
+                result = mark_task(task_ref)
+            speak(result)
+            continue
+        
+        
+        
+        elif "stop" in user_input.lower():
+            speak("Goodbye!")
+            break
+        
+        
+        response  = chat.send_message(user_input)
+        speak( response.text)
+    time.sleep(2)
     
-    elif "add task" in user_input.lower():
-        task = user_input.split("add task")[-1].strip()
-        result = add_task(task)
-        speak(result)
-        continue
-    
-    response  = chat.send_message(user_input)
-    speak( response.text)
+def main():
+    convo_flow()
+main()
